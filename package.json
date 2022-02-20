@@ -1,0 +1,26 @@
+{
+  "name": "kursach",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc-w": "npx tsc --watch index.ts",
+    "tsc": "npx tsc index.ts"
+  },
+  "repository": "git+https://github.com/4t4nner/kur.git",
+  "author": "4t4nner <tannerman@inbox.ru>",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/4t4nner/kur/issues"
+  },
+  "homepage": "https://github.com/4t4nner/kur#readme",
+  "dependencies": {
+    "npm-watch": "^0.11.0",
+    "typescript": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.18"
+  }
+}
