@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		// {
+		// 	"label": "build",
+		// 	"type": "shell",
+		// 	"command": "nvm use v16.15.0 && node --version",
+		// 	"problemMatcher": []
+		// }
+		
+	]
+}

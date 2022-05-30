@@ -1,39 +1,23 @@
+import type { WayIK } from './types.js';
+
 import {promises} from 'fs';
+import { badIntervals, materials, products as unsortProducts } from './config.js';
 
 const fs = promises;
 
-interface WayIK {
-    way: Int32Array
-    limited: boolean
-    rest: number // real
-}
-
-type Matrix3 = Record<number, WayIK[]>
-
-// has
-const materials = [
-    [3000, 4],
-    [4000, 5],
-    [6000, 9999],
-];
-// const mLengths = materials.map(([length]) => length);
+// type Matrix3 = Record<number, WayIK[]>
 
 // needed
-const products = [
-    [1700, 3],
-    [1500, 5],
-    [700, 8],
-].sort(([aLen], [bLen]) => bLen - aLen); // по убываниию
+
+const products = unsortProducts.sort(([aLen], [bLen]) => bLen - aLen); // по убываниию
 
 const pLen = products.map(([length]) => length);
 const P_SIZE = products.length;
 // j - material
 // k - products
 // i - kind of cut
-const a_jki = Object.fromEntries(materials.map(([mLen, mMax]) => {
+const a_jki = Object.fromEntries(materials.map(([mLen/*, mMax */]) => {
     const wayIK: WayIK[] = [];
-
-    // как можно порезать материал mLen на детали ?
 
     const minPLen = pLen.slice(-1)[0];
     // первый ненулевой столбец, определяется на предыдущем шаге
@@ -43,37 +27,33 @@ const a_jki = Object.fromEntries(materials.map(([mLen, mMax]) => {
         const curProducts = new Int32Array(P_SIZE); // of products.lenght
         for (let k = startProductCol; k < P_SIZE && mLenCur > minPLen; k++) {
             // обходить изделия
-            let next = false;
+            // let next = false;
             let curQuantity = 0;
             if (k === startProductCol && wayIK.length) {
-                // это первый ненулевой столбец, он точно входит
+                // первый ненулевой столбец
                 curQuantity = wayIK.slice(-1)[0].way[startProductCol] - 1; // на 1 меньше предыдущей строки в первом ненулевом столбце
                 mLenCur -= pLen[k] * curQuantity;
             } else {
                 //	увеличивать количество_текущей_детали пока меньше длины материала и количества изделий
-                // todo перелать на деление?
                 while (mLenCur >= products[k][0] && products[k][1] > curQuantity) {
                     mLenCur -= pLen[k];
                     curProducts[k] = ++curQuantity;
 
-                    // todo костыль. сделать аккуратнее
                     wayIK.push({
                         way: curProducts.slice(),
                         limited: mLenCur > minPLen,
                         rest: mLenCur,
                     });
+                    // if (mLenCur < badIntervals.from || badIntervals.to > mLenCur) {
+                    //     wayIK.push({
+                    //         way: curProducts.slice(),
+                    //         limited: mLenCur > minPLen,
+                    //         rest: mLenCur,
+                    //     });
+                    // }
                 }
             }
             curProducts[k] = curQuantity;
-
-            // if (curQuantity && !next) {
-            // 	wayIK.push({
-            // 		way: curProducts.slice(),
-            // 		limited: mLenCur > minPLen,
-            // 		rest: mLenCur,
-            // 	});
-            // }
-
         }
         startProductCol = curProducts.findIndex(pQuant => pQuant !== 0) as number;
         // пока единственный ненулевой столбец - не последний
@@ -91,10 +71,10 @@ const csv = products.map(([pLen, pCount]) => `${pLen}, ${pCount}`).join(';') + `
     );
 
 fs.writeFile('out/out.json', json).catch(e => {
-	debugger
+	console.error(e);
 });
 fs.writeFile('out/out.csv', csv).catch(e => {
-	debugger
+	console.error(e);
 });
-debugger;
 
+export default a_jki;
