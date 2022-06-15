@@ -16,8 +16,11 @@ const P_SIZE = products.length;
 // j - material
 // k - products
 // i - kind of cut
+
+const badWays: Record<number, Record<string, any>[]> = {};
 const a_jki = Object.fromEntries(materials.map(([mLen/*, mMax */]) => {
     const wayIK: WayIK[] = [];
+    badWays[mLen] = [];
 
     const minPLen = pLen.slice(-1)[0];
     // первый ненулевой столбец, определяется на предыдущем шаге
@@ -39,18 +42,20 @@ const a_jki = Object.fromEntries(materials.map(([mLen/*, mMax */]) => {
                     mLenCur -= pLen[k];
                     curProducts[k] = ++curQuantity;
 
-                    wayIK.push({
-                        way: curProducts.slice(),
-                        limited: mLenCur > minPLen,
-                        rest: mLenCur,
-                    });
-                    // if (mLenCur < badIntervals.from || badIntervals.to > mLenCur) {
-                    //     wayIK.push({
-                    //         way: curProducts.slice(),
-                    //         limited: mLenCur > minPLen,
-                    //         rest: mLenCur,
-                    //     });
-                    // }
+                    if (mLenCur < badIntervals.from || mLenCur > badIntervals.to) {
+                        wayIK.push({
+                            way: curProducts.slice(),
+                            limited: mLenCur > minPLen,
+                            rest: mLenCur,
+                        });
+                    } else {
+                        badWays[mLen].push({
+                            way: curProducts.slice(),
+                            limited: mLenCur > minPLen,
+                            rest: mLenCur,
+                        });
+
+                    }
                 }
             }
             curProducts[k] = curQuantity;
@@ -63,18 +68,22 @@ const a_jki = Object.fromEntries(materials.map(([mLen/*, mMax */]) => {
 }));
 
 const json = JSON.stringify(a_jki);
-const csv = products.map(([pLen, pCount]) => `${pLen}, ${pCount}`).join(';') + `;is_limited;Остаток\n` +
+const csv = products.map(([pLen, pCount]) => `${pLen}, ${pCount}`).join(';')
+    + `;is_limited;Остаток\n`
     // mLen, mCount \n
     // aij;...;is_limited;Остаток
-    Object.entries(a_jki).map(([mLen, ways], index) => `${mLen}, ${materials[index][1]}\n` +
+    + Object.entries(a_jki).map(([mLen, ways], index) => `${mLen}, ${materials[index][1]}\n` +
         ways.map(({ way, limited, rest }) => way.join(';') + `;${limited};${rest}\n`).join('')
     );
 
+fs.writeFile('out/badWays.json', json).catch(e => {
+    console.error(e);
+});
 fs.writeFile('out/out.json', json).catch(e => {
-	console.error(e);
+    console.error(e);
 });
 fs.writeFile('out/out.csv', csv).catch(e => {
-	console.error(e);
+    console.error(e);
 });
 
 export default a_jki;

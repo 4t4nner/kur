@@ -14,9 +14,9 @@
   "homepage": "https://github.com/4t4nner/kur#readme",
   "devDependencies": {
     "@types/node": "~16",
-    "@typescript-eslint/eslint-plugin": "~5.26",
-    "@typescript-eslint/parser": "~5.26",
-    "eslint": "~8.16",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "eslint": "^8.16.0",
     "rimraf": "~3.0",
     "tsutils": "~3.21",
     "typescript": "~4.7"
@@ -29,6 +29,10 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "assert": "^2.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-jest": "^26.4.6",
+    "mathjs": "^10.6.1",
     "simple-simplex": "^1.0.1",
     "tslib": "~2.4"
   },
